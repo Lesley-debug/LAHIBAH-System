@@ -13,11 +13,11 @@ enum Usersex {
 }
 
 model Admin {
-  id       String @id @default(cuid())
-  userName String
-  email    String @unique
+  id            String             @id @default(cuid())
+  userName      String
+  email         String             @unique
   notification  Notification[]
-  notifications notificationRead[]
+  notifications NotificationRead[]
 }
 
 model Department {
@@ -39,11 +39,11 @@ model Grade {
 }
 
 model Subject {
-  id           Int     @id @default(autoincrement())
-  name         String  @unique
-  gradeId      String?
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  gradeId String?
 
-  grade      Grade?      @relation(fields: [gradeId], references: [id])
+  grade      Grade?       @relation(fields: [gradeId], references: [id])
   department Department[]
 
   assignments Assignment[]
@@ -54,7 +54,6 @@ model Subject {
   timetables  Timetable[]
   students    Student[]
   teachers    Teacher[]
-
 }
 
 model Student {
@@ -73,26 +72,26 @@ model Student {
   departmentId String
   gradeId      String?
   levelId      Int
-  matricule    String? @unique
+  matricule    String?    @unique
   DateOfBirth  DateTime?
   department   Department @relation(fields: [departmentId], references: [id])
   parent       Parent?    @relation(fields: [parentId], references: [id])
-  level        Level      @relation( fields: [levelId], references: [id])
+  level        Level      @relation(fields: [levelId], references: [id])
 
-  attendance Attendance[]
-  fees       Fee[]
-  results    Result[]
-  courses    Subject[]
-  readReceipts notificationRead[]
+  attendance   Attendance[]
+  fees         Fee[]
+  results      Result[]
+  courses      Subject[]
+  readReceipts NotificationRead[]
 }
 
 model Level {
-   id        Int  @id @default(autoincrement())
-   LevelName  String @unique
-   student   Student[]
-   exam     Exam[]
-   
+  id        Int       @id @default(autoincrement())
+  LevelName String    @unique
+  student   Student[]
+  exam      Exam[]
 }
+
 model Teacher {
   id          String       @id @default(cuid())
   username    String       @unique
@@ -104,6 +103,7 @@ model Teacher {
   lastName    String
   sex         Usersex
   image       String?
+  teachersId  String       @unique
   DateOfBirth DateTime?
   courses     Subject[]
   department  Department[] @relation("DepartmentSupervisor")
@@ -125,8 +125,8 @@ model Parent {
 }
 
 model Classroom {
-  id       String  @id @default(cuid())
-  name     String  @unique
+  id       String    @id @default(cuid())
+  name     String    @unique
   courseId Int
   exams    Exam[]
   course   Subject[]
@@ -144,7 +144,7 @@ model Event {
 }
 model Exam {
   id              Int              @id @default(autoincrement())
-  name            String           @unique       
+  name            String           @unique
   title           String
   startDate       DateTime
   endDate         DateTime
@@ -164,7 +164,7 @@ model ExamDepartment {
   examId       Int
   departmentId String
 
-  exam       Exam       @relation(fields: [examId], references: [id] , onDelete: Cascade)
+  exam       Exam       @relation(fields: [examId], references: [id], onDelete: Cascade)
   department Department @relation(fields: [departmentId], references: [id])
 
   @@id([examId, departmentId]) // composite PK
@@ -204,9 +204,10 @@ model Result {
   grand     String
 
   course  Subject @relation(fields: [courseId], references: [id])
-  exam    Exam?   @relation(fields: [examId], references: [id] , onDelete: SetNull)
+  exam    Exam?   @relation(fields: [examId], references: [id], onDelete: SetNull)
   student Student @relation(fields: [studentId], references: [id])
-   @@unique([studentId, courseId])
+
+  @@unique([studentId, courseId])
 }
 
 model Timetable {
@@ -238,32 +239,33 @@ model Fee {
 }
 
 model Announcement {
-  id           String   @id @default(cuid())
-  title        String
-  message      String   @db.Text
-  date         DateTime @default(now())
-  departmentId String?
-  notificationRead notificationRead[]
+  id               String             @id @default(cuid())
+  title            String
+  message          String             @db.Text
+  date             DateTime           @default(now())
+  departmentId     String?
+  notificationRead NotificationRead[]
 
   department Department? @relation(fields: [departmentId], references: [id])
 }
+
 model Notification {
-  id      String   @id @default(cuid())
-  title   String
-  message String
+  id        String   @id @default(cuid())
+  title     String
+  message   String
   createdAt DateTime @default(now())
   teacherId String?
   teacher   Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  
-  adminId   String?
-  admin     Admin?   @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  notificationRead notificationRead[]
+
+  adminId          String?
+  admin            Admin?             @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  notificationRead NotificationRead[]
 }
 
-model notificationRead {
-  id             String   @id @default(cuid())
+model NotificationRead {
+  id             String    @id @default(cuid())
   notificationId String
-  read           Boolean  @default(false)
+  read           Boolean   @default(false)
   readAt         DateTime?
   studentId      String?
   teacherId      String?
@@ -275,7 +277,7 @@ model notificationRead {
   teacher      Teacher?      @relation(fields: [teacherId], references: [id])
   admin        Admin?        @relation(fields: [adminId], references: [id])
   notification Notification  @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-  announcement Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade) 
+  announcement Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
 
   // Indexes for fast lookups
   @@index([studentId])
